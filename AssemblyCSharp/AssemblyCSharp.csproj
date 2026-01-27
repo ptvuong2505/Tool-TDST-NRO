@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<AssemblyName>Assembly-CSharp</AssemblyName>
+		<GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+		<TargetFramework>net35</TargetFramework>
+	</PropertyGroup>
+	<PropertyGroup>
+		<LangVersion>11.0</LangVersion>
+		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<WarningLevel>0</WarningLevel>
+		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+		<OutputPath>..\TOOL_TDST\Nro_246_Data\Managed</OutputPath>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<WarningLevel>0</WarningLevel>
+		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+		<OutputPath>..\TOOL_TDST\Nro_246_Data\Managed</OutputPath>
+	</PropertyGroup>
+	<ItemGroup>
+		<Reference Include="LitJSON">
+			<HintPath>..\TOOL_TDST\Nro_246_Data\Managed\LitJson.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine">
+			<HintPath>..\TOOL_TDST\Nro_246_Data\Managed\UnityEngine.dll</HintPath>
+		</Reference>
+	</ItemGroup>
+</Project>

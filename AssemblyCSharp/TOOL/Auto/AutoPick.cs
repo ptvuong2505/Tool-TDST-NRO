@@ -1,0 +1,298 @@
+using AssemblyCSharp.Xmap;
+using System;
+using System.Collections.Generic;
+using TOOl;
+using TOOl.Auto;
+
+namespace AssemblyCSharp.TOOL.Auto
+{
+	public class AutoPick : IActionListener, IChatable
+	{
+		private static AutoPick _Instance;
+
+		public static bool isAutoPick = true;
+
+		public static long lastTimePickedItem;
+
+		private static int maximumPickDistance = 300;
+
+		private static bool isTeleportToItem = true;
+
+		private static bool isPickAll = false;
+
+		public static int pickByList = 1;
+
+		private static List<int> listItemAutoPick = new List<int>() { 861 };
+
+		private static string[] inputMaximumPickDistance = new string[2] { "Nhập khoảng cách nhặt", "khoảng cách (>50)" };
+
+		private static string[] inputItemID = new string[2] { "Nhập ID của item", "ID" };
+
+		public static int maxCountPick = 4;
+
+        public static AutoPick getInstance()
+		{
+			if (_Instance == null)
+				_Instance = new AutoPick();
+			return _Instance;
+		}
+
+		public static void Update()
+		{
+			if (Pk9rXmap.IsXmapRunning || Utilities.isHome())
+				return;
+
+			FocusToNearestItem();
+			if (Char.myCharz().itemFocus != null)
+				PickIt();
+		}
+
+		public void onChatFromMe(string text, string to)
+		{
+			if (ChatTextField.gI().tfChat.getText() != null && !ChatTextField.gI().tfChat.getText().Equals(string.Empty) && !text.Equals(string.Empty) && text != null)
+			{
+				if (ChatTextField.gI().strChat.Equals(inputMaximumPickDistance[0]))
+				{
+					try
+					{
+						int num = (maximumPickDistance = int.Parse(ChatTextField.gI().tfChat.getText()));
+						GameScr.info1.addInfo("Khoảng Cách Nhặt: " + num, 0);
+					}
+					catch
+					{
+						GameScr.info1.addInfo("Số Không Hợp Lệ, Vui Lòng Nhập Lại!", 0);
+					}
+					ResetChatTextField();
+				}
+				else if (ChatTextField.gI().strChat.Equals(inputItemID[0]))
+				{
+					try
+					{
+						int num2 = int.Parse(ChatTextField.gI().tfChat.getText());
+						listItemAutoPick.Add(num2);
+						GameScr.info1.addInfo("Đã Thêm Item " + num2, 0);
+					}
+					catch
+					{
+						GameScr.info1.addInfo("Số Không Hợp Lệ, Vui Lòng Nhập Lại!", 0);
+					}
+					ResetChatTextField();
+				}
+			}
+			else
+				ChatTextField.gI().isShow = false;
+		}
+
+		public void onCancelChat()
+		{
+			if (GameScr.isPaintMessage)
+			{
+				GameScr.isPaintMessage = false;
+				ChatTextField.gI().center = null;
+			}
+		}
+
+		public void perform(int idAction, object p)
+		{
+			switch (idAction)
+			{
+			case 1:
+				isAutoPick = !isAutoPick;
+				pickByList = 0;
+				GameScr.info1.addInfo("Auto Nhặt\n" + (isAutoPick ? "[STATUS: ON]" : "[STATUS: OFF]"), 0);
+				break;
+			case 2:
+				isPickAll = !isPickAll;
+				GameScr.info1.addInfo("Nhặt Tất Cả\n" + (isPickAll ? "[STATUS: ON]" : "[STATUS: OFF]"), 0);
+				break;
+			case 3:
+				isAutoPick = !isAutoPick;
+				pickByList = 1;
+				GameScr.info1.addInfo("Nhặt Theo Danh Sách\n" + (isAutoPick ? "[STATUS: ON]" : "[STATUS: OFF]"), 0);
+				break;
+			case 4:
+				isTeleportToItem = !isTeleportToItem;
+				GameScr.info1.addInfo("Dịch Đến Item\n" + (isTeleportToItem ? "[STATUS: ON]" : "[STATUS: OFF]"), 0);
+				break;
+			case 5:
+				ChatTextField.gI().strChat = inputMaximumPickDistance[0];
+				ChatTextField.gI().tfChat.name = inputMaximumPickDistance[1];
+				ChatTextField.gI().startChat2(getInstance(), string.Empty);
+				break;
+			case 6:
+				if (listItemAutoPick.Count == 0)
+					GameScr.info1.addInfo("Danh Sách Trống!", 0);
+				if (listItemAutoPick.Count > 0)
+				{
+					string text = "";
+					for (int i = 0; i < listItemAutoPick.Count; i++)
+					{
+						text = text + listItemAutoPick[i] + " ";
+					}
+					GameScr.info1.addInfo(text, 0);
+				}
+				break;
+			case 7:
+				listItemAutoPick.Clear();
+				GameScr.info1.addInfo("Đã Clear Danh Sách Nhặt!", 0);
+				break;
+			case 8:
+				ChatTextField.gI().strChat = inputItemID[0];
+				ChatTextField.gI().tfChat.name = inputItemID[1];
+				ChatTextField.gI().startChat2(getInstance(), string.Empty);
+				break;
+			case 9:
+				listItemAutoPick.Add(Char.myCharz().itemFocus.template.id);
+				GameScr.info1.addInfo("Đã thêm " + Char.myCharz().itemFocus.template.name + " [" + Char.myCharz().itemFocus.template.id + "]", 0);
+				break;
+			}
+		}
+
+		public static void ShowMenu()
+		{
+			MyVector myVector = new MyVector();
+			myVector.addElement(new Command("Auto Nhặt\n" + ((!isAutoPick || pickByList != 0) ? "[STATUS: OFF]" : "[STATUS: ON]"), getInstance(), 1, null));
+			myVector.addElement(new Command("Nhặt Tất Cả\n" + (isPickAll ? "[STATUS: ON]" : "[STATUS: OFF]"), getInstance(), 2, null));
+			myVector.addElement(new Command("Nhặt Theo Danh Sách\n" + ((!isAutoPick || pickByList != 1) ? "[STATUS: OFF]" : "[STATUS: ON]"), getInstance(), 3, null));
+			myVector.addElement(new Command("Dịch Đến Item\n" + (isTeleportToItem ? "[STATUS: ON]" : "[STATUS: OFF]"), getInstance(), 4, null));
+			myVector.addElement(new Command("Khoảng Cách Nhặt\n[" + maximumPickDistance + "]", getInstance(), 5, null));
+			myVector.addElement(new Command("Xem Danh Sách Nhặt", getInstance(), 6, null));
+			myVector.addElement(new Command("Clear Danh Sách Nhặt", getInstance(), 7, null));
+			myVector.addElement(new Command("Thêm ItemID", getInstance(), 8, null));
+			if (Char.myCharz().itemFocus != null)
+				myVector.addElement(new Command("Thêm: " + Char.myCharz().itemFocus.template.name + " [" + Char.myCharz().itemFocus.template.id + "] ", getInstance(), 9, null));
+			GameCanvas.menu.startAt(myVector, 3);
+		}
+
+		private static void ResetChatTextField()
+		{
+			ChatTextField.gI().strChat = "Chat";
+			ChatTextField.gI().tfChat.name = "chat";
+			ChatTextField.gI().isShow = false;
+		}
+
+		public static void FocusToNearestItem()
+		{
+			if(Char.myCharz().itemFocus != null && !isPickIt(Char.myCharz().itemFocus))
+				Char.myCharz().itemFocus = null;
+
+            if (Char.myCharz().itemFocus != null)
+				return;
+
+			int num = GameScr.vItemMap.size()-1;
+			ItemMap itemMap;
+			while (true)
+			{
+				if (num >=0)
+				{
+					itemMap = (ItemMap)GameScr.vItemMap.elementAt(num);
+					int num2 = Math.abs(Char.myCharz().cx - itemMap.x);
+					int num3 = Math.abs(Char.myCharz().cy - itemMap.y);
+                    if (itemMap!=null && num2 <= maximumPickDistance && num3 <= maximumPickDistance && isPickIt(itemMap) && itemMap.template.id != 673)
+						break;
+					RemoveUnpickableItem(itemMap);
+                    num--;
+					continue;
+				}
+				return;
+			}
+			Char.myCharz().itemFocus = itemMap;
+		}
+
+		public static void RemoveUnpickableItem(ItemMap item)
+		{
+			GameScr.vItemMap.removeElement(item);
+        }
+
+		public static void PickIt()
+		{
+			if (mSystem.currentTimeMillis() - lastTimePickedItem < 550L || Char.myCharz().itemFocus == null)
+				return;
+
+            if (isTeleportToItem && !Char.isLockKey)
+			{
+				TeleportTo(Char.myCharz().itemFocus.x, Char.myCharz().itemFocus.y);
+				GameCanvas.clearKeyHold();
+				GameCanvas.clearKeyPressed();
+				if (Char.myCharz().itemFocus.template.id != 673)
+				{
+                    Char.myCharz().itemFocus.countAutoPick++;
+                    Service.gI().pickItem(Char.myCharz().itemFocus.itemMapID);
+					lastTimePickedItem = mSystem.currentTimeMillis();
+                }
+				return;
+			}
+			if (Char.myCharz().cx < Char.myCharz().itemFocus.x)
+				Char.myCharz().cdir = 1;
+			else
+				Char.myCharz().cdir = -1;
+			int num = Math.abs(Char.myCharz().cx - Char.myCharz().itemFocus.x);
+			int num2 = Math.abs(Char.myCharz().cy - Char.myCharz().itemFocus.y);
+			if (num <= 40 && num2 < 40)
+			{
+				GameCanvas.clearKeyHold();
+				GameCanvas.clearKeyPressed();
+				if (Char.myCharz().itemFocus.template.id != 673)
+				{
+                    Char.myCharz().itemFocus.countAutoPick++;
+                    Service.gI().pickItem(Char.myCharz().itemFocus.itemMapID);
+					lastTimePickedItem = mSystem.currentTimeMillis();
+                }
+			}
+			else
+			{
+				Char.myCharz().currentMovePoint = new MovePoint(Char.myCharz().itemFocus.x, Char.myCharz().itemFocus.y);
+				Char.myCharz().endMovePointCommand = new Command(null, null, 8002, null);
+				GameCanvas.clearKeyHold();
+				GameCanvas.clearKeyPressed();
+			}
+		}
+
+		private static void TeleportTo(int x, int y)
+		{
+            Char.myCharz().cx = x;
+			Char.myCharz().cy = y;
+			Service.gI().charMove();
+            if (!GameScr.canAutoPlay)
+            {
+                Char.myCharz().cx = x;
+                Char.myCharz().cy = y + 1;
+                Service.gI().charMove();
+                Char.myCharz().cx = x;
+                Char.myCharz().cy = y;
+                Service.gI().charMove();
+            }
+        }
+
+		private static bool isPickIt(ItemMap item)
+		{
+			if (isPickAll)
+				return true;
+			if (pickByList == 0)
+			{
+				if (item.playerId != Char.myCharz().charID)
+					return item.playerId == -1;
+				return true;
+			}
+			if (pickByList == 1 && listItemAutoPick.Contains(item.template.id))
+			{
+				return item.countAutoPick < maxCountPick;
+			}
+			return false;
+		}
+
+		private static bool isNRDMap(int mapID)
+		{
+			if (mapID >= 85)
+				return mapID <= 91;
+			return false;
+		}
+
+		private static bool isNRD(ItemMap item)
+		{
+			if (item.template.id >= 372)
+				return item.template.id <= 378;
+			return false;
+		}
+	}
+}
