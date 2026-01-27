@@ -60,5 +60,3 @@ nunit-*.xml
 
 # Bỏ qua toàn bộ nội dung trong TOOL_TDST/Data
 TOOL_TDST/Data/
-
-/output_log.txt
