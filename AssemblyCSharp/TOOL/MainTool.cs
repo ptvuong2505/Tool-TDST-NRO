@@ -80,10 +80,10 @@ public class MainTool
         MainThreadDispatcher.update();
         AutoGoback.update();
 
-        if (GameCanvas.gameTick % 10 == 0)
-        {
-            ClearMap();
-        }
+        //if (GameCanvas.gameTick % 10 == 0)
+        //{
+        //    ClearMap();
+        //}
         if(Char.myCharz().meDead)
         {
             return;
@@ -265,9 +265,11 @@ public class MainTool
         }
     }
 
-    public static void ChangeToZoneBoss(int zone)
+    public static void ChangeToZoneBoss(int zoneId, int mapId)
     {
-        AutoGoback.goToBossZone(zone);
+        MainTool.zoneBoss = zoneId;
+        MainTool.mapBoss = mapId;
+        AutoGoback.goToBossZone();
     }
 
     public static void AutoUseItemBuffSD()

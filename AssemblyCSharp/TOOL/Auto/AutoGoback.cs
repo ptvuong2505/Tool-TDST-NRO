@@ -324,7 +324,7 @@ namespace TOOl.Auto
                 {
                     
                     lastZoneCheckTime = mSystem.currentTimeMillis();
-                    if(GameScr.gI().numPlayer[currentCheckingZone] < GameScr.gI().maxPlayer[currentCheckingZone])
+                    if(GameScr.gI().numPlayer[targetZoneId] < GameScr.gI().maxPlayer[targetZoneId])
                     {
                         Service.gI().requestChangeZone(targetZoneId, -1);
                     }
@@ -396,15 +396,15 @@ namespace TOOl.Auto
             changeState(BossHuntState.RunningToMapBoss);
         }
 
-        public static void goToBossZone(int zone)
+        public static void goToBossZone()
         {
-            targetZoneId = zone;
-            targetMapId = MainTool.mapBoss; // Sử dụng mapBoss đã được set từ message
-            MainTool.zoneBoss = zone;
+            // Sử dụng mapBoss và zoneBoss đã được set từ message
+            targetZoneId = MainTool.zoneBoss;
+            targetMapId = MainTool.mapBoss; 
             foundBossSent = true;
    
             // Nếu chưa ở đúng map hoặc zone
-            if (TileMap.mapID != targetMapId || TileMap.zoneID != zone)
+            if (TileMap.mapID != targetMapId || TileMap.zoneID != targetZoneId)
             {
                 changeState(BossHuntState.GoingToBossZone);
             }

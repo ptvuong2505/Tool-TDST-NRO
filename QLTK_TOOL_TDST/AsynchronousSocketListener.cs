@@ -123,9 +123,10 @@ namespace QLTK_TOOL_TDST
                     account.sendMessage(new JObject
                     {
                         ["action"] = "changeToZone",
-                        ["zone"] = zone,
+                        ["zoneId"] = zone,
                         ["mapId"] = mapId
                     });
+                    Console.WriteLine($"Da gui toi account {account.UserName}");
                 }
             }
         }

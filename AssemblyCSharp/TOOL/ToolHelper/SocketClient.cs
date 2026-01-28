@@ -1,4 +1,5 @@
-﻿using LitJson;
+﻿using Assets.src.g;
+using LitJson;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -50,10 +51,9 @@ public class SocketClient : ThreadAction<SocketClient>
                 AutoGoback.Waiting();
                 break;
             case "changeToZone":
-                int zone = int.Parse(msg["zone"].ToString());
+                int zoneId = int.Parse(msg["zoneId"].ToString());
                 int mapId = int.Parse(msg["mapId"].ToString());
-                MainTool.mapBoss = mapId;
-                MainTool.ChangeToZoneBoss(zone);
+                MainTool.ChangeToZoneBoss(zoneId, mapId);
                 break;
             case "test":
                 //MainTool.GetInfor("BOSS Tiểu đội trưởng vừa xuất hiện tại Đông Nam Guru");
@@ -74,7 +74,11 @@ public class SocketClient : ThreadAction<SocketClient>
     public void sendMessage(object obj)
     {
         string json = JsonMapper.ToJson(obj);
-        byte[] msg = Encoding.ASCII.GetBytes(json);
+        if (!json.EndsWith("\n"))
+        {
+            json += "\n";
+        }
+        byte[] msg = Encoding.UTF8.GetBytes(json);
         try
         {
             sender.Send(msg);
@@ -91,6 +95,7 @@ public class SocketClient : ThreadAction<SocketClient>
             return;
         }
         byte[] bytes = new byte[4096];
+        string incompleteMessage = "";
         while (true)
         {
             JsonData msg;
@@ -98,7 +103,32 @@ public class SocketClient : ThreadAction<SocketClient>
             {
                 int bytesRec = sender.Receive(bytes);
                 string receive = Encoding.ASCII.GetString(bytes, 0, bytesRec);
-                msg = JsonMapper.ToObject(receive);
+
+                receive = incompleteMessage + receive;
+                incompleteMessage = "";
+
+                string[] messages = receive.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+
+                foreach (string message in messages)
+                {
+                    string trimmed = message.Trim();
+                    if (string.IsNullOrEmpty(trimmed))
+                        continue;
+
+                    try
+                    {
+                        msg = JsonMapper.ToObject(trimmed);
+                        MainThreadDispatcher.dispatcher(delegate
+                        {
+                            onMessage(msg);
+                        });
+                    }
+                    catch (Exception)
+                    {
+                        // Message chưa đầy đủ, lưu lại cho lần sau
+                        incompleteMessage = trimmed;
+                    }
+                }
             }
             catch (SocketException)
             {
@@ -112,13 +142,9 @@ public class SocketClient : ThreadAction<SocketClient>
             }
             catch (Exception ex3)
             {
-                writeLog(ex3.ToString());
+                //writeLog(ex3.ToString());
                 continue;
             }
-            MainThreadDispatcher.dispatcher(delegate
-            {
-                onMessage(msg);
-            });
         }
     }
 
