@@ -80,11 +80,11 @@ public class MainTool
         MainThreadDispatcher.update();
         AutoGoback.update();
 
-        //if (GameCanvas.gameTick % 10 == 0)
-        //{
-        //    ClearMap();
-        //}
-        if(Char.myCharz().meDead)
+        if (GameCanvas.gameTick % 10 == 0)
+        {
+            ClearMap();
+        }
+        if (Char.myCharz().meDead)
         {
             return;
         }
