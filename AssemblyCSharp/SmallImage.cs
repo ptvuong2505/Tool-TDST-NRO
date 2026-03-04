@@ -100,25 +100,25 @@ public class SmallImage
 	public static void createImage(int id)
 	{
 		Res.outz("is request =" + id + " zoom=" + mGraphics.zoomLevel);
-		if (mGraphics.zoomLevel == 1)
-		{
-			Image image = GameCanvas.loadImage("/SmallImage/Small" + id + ".png");
-			if (image != null)
-			{
-				imgNew[id] = new Small(image, id);
-				return;
-			}
-			imgNew[id] = new Small(imgEmpty, id);
-			if (GameCanvas.currentScreen == GameCanvas._SelectCharScr)
-			{
-				Service.gI().requestIcon(id);
-			}
-			else
-			{
-				vt_images_watingDowload.addElement(imgNew[id]);
-			}
-			return;
-		}
+		//if (mGraphics.zoomLevel == 1)
+		//{
+		//	Image image = GameCanvas.loadImage("/SmallImage/Small" + id + ".png");
+		//	if (image != null)
+		//	{
+		//		imgNew[id] = new Small(image, id);
+		//		return;
+		//	}
+		//	imgNew[id] = new Small(imgEmpty, id);
+		//	if (GameCanvas.currentScreen == GameCanvas._SelectCharScr)
+		//	{
+		//		Service.gI().requestIcon(id);
+		//	}
+		//	else
+		//	{
+		//		vt_images_watingDowload.addElement(imgNew[id]);
+		//	}
+		//	return;
+		//}
 		Image image2 = GameCanvas.loadImage("/SmallImage/Small" + id + ".png");
 		if (image2 != null)
 		{

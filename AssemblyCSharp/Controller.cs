@@ -2647,7 +2647,7 @@ public class Controller : IMessageHandler
 					array17 = null;
 					SmallImage.imgNew[num156].img = Image.createRGBImage(new int[1], 1, 1, bl: true);
 				}
-				if (array17 != null && mGraphics.zoomLevel > 1)
+				if (array17 != null)
 				{
 					Rms.saveRMS(mGraphics.zoomLevel + "Small" + num156, array17);
 				}
