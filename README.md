@@ -58,7 +58,7 @@ TOOL/
 ### Cài đặt
 
 1. Tải bảng build ở [releases](https://github.com/ptvuong2505/Tool-Nro-TDST/releases)
-2. Nếu muốn custome thì clone repo này
+2. Nếu muốn custom thì clone repo này
 
 ### Chạy Tool
 
